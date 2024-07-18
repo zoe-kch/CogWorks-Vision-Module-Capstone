@@ -7,8 +7,19 @@
 """
 
 from facenet_models import FacenetModel
-import skimage.io as io
+import skimage.io as io # reading an image file in as a numpy array
 import numpy as np
+
+import pickle # for database
+import networkx as nx
+
+# could delete if we don't use
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from mynn.layers.dense import dense
+from mynn.optimizers.sgd import SGD
+
+from . import database # remove later
 
 
 # this will download the pretrained weights for MTCNN and resnet
@@ -29,7 +40,7 @@ def cos_dist(a,b):
     return 1 - np.dot(a,b) / (np.abs(a) @ np.abs(b))
 
 
-def match(descriptors,threshold):
+def match(descriptors, threshold):
     all_dists = {}
     
     for name,d in database.items():

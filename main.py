@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mynn.layers.dense import dense
 from mynn.optimizers.sgd import SGD
+from database import database
+from user_profile import Profile
 
 #for vscode, remove later
 '''
@@ -30,20 +32,29 @@ model = FacenetModel()
 
 def image_to_rgb(image_path):
     # shape-(Height, Width, Color)
-    image = io.imread(str(image_path))
+    image = io.imread(str(image_path)).astype(np.float32) # had to change it to np.float32 bc I was getting problems without it
     if image.shape[-1] == 4:
         # Image is RGBA, where A is alpha -> transparency
         # Must make image RGB.
         image = image[..., :-1]  # png -> RGB
-
+    return image.astype(np.float32)
 
 def cos_dist(a,b):
-    return 1 - np.dot(a,b) / (np.linalg.norm(a) @ np.linalg.norm(b))
+    return 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)) # changed from @ to * because a and b have different float types 
 
 # check if cos_dist == cosine_sim
 from sklearn.metrics.pairwise import cosine_similarity
 def cosine_sim(descriptors1, descriptors2):
     return cosine_similarity(descriptors1, descriptors2)
+
+
+def connected_components():
+    pass
+
+
+def propogate_label():
+    pass
+
 
 def match(descriptors, threshold):
     all_dists = {}
@@ -64,14 +75,13 @@ def match(descriptors, threshold):
         Profile.add("Unknown",descriptors)
 
 
-def detect_faces(image):
+def detect_faces(image, threshold=.9):
     """
     It takes in an image and return a list of
     boxes that are already filtered respect to the threshold
     """
     boxes, probabilities, landmarks = model.detect(image)
     # just assuming that this is the threshold
-    threshold = 0.9
     
     # these are a list of boxes filtered after the threshold
     filtered = [box for box, prob in zip(boxes, probabilities) if prob > threshold]
@@ -100,7 +110,7 @@ def main():
     """
     
 
-    pic = "imgs/gauss_train.jpg"
+    pic = "imgs/newton.png"
     rgb_pic = image_to_rgb(pic)
     
     boxes = detect_faces(rgb_pic)

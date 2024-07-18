@@ -29,7 +29,21 @@ def cos_dist(a,b):
     return 1 - np.dot(a,b) / (np.abs(a) @ np.abs(b))
 
 
+def match(descriptors,threshold):
+    all_dists = {}
     
+    for name,d in database.items():
+        all_dists[name] = cos_dist(descriptors, np.mean(d))
+        
+    min = np.min(all_dists)
+    min_name = min(all_dists, key=all_dists.get)
+    
+    if min < threshold:
+        return str(min_name) # assuming min_name is a profile stored in database
+    else:
+        print('unknown')
+
+
 def connected_components():
     pass
 

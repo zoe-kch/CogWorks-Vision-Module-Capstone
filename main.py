@@ -81,7 +81,7 @@ def initialize_database():
     global database
     global image_path
     global threshold
-    ret_descriptors, ret_rgb_img = [], []
+    ret_descriptors, ret_rgb_img, imgs = [], [], []
 
     for image_dir in os.listdir(image_path):
         profile = None
@@ -89,6 +89,7 @@ def initialize_database():
             full_img_path = Path(image_path / image_dir / image)
 
             print(full_img_path)
+            img = image_to_rgb(full_img_path)
             img_rgb = image_to_rgb(full_img_path)
 
             boxes = detect_faces(img_rgb)
@@ -105,12 +106,13 @@ def initialize_database():
                 database[profile.name] = profile
                 ret_descriptors.append(descriptor_vector)
                 ret_rgb_img.append(img_rgb)
+                imgs.append(img)
 
 
         if threshold is None and boxes:
             threshold = find_threshold(str(image_dir))
 
-    return ret_descriptors, ret_rgb_img
+    return ret_descriptors, ret_rgb_img, imgs
 
 
 def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: List[str]):
@@ -135,7 +137,7 @@ def image_to_rgb(image_to_rgb_path):
         # Image is RGBA, where A is alpha -> transparency
         # Must make image RGB.
         image = image[..., :-1]  # png -> RGB
-    return image.astype(np.float32)
+    return image.astype(np.uint8)
 
 def cos_dist(a,b):
     out = 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)) # changed from @ to * because a and b have different float types 
@@ -202,13 +204,15 @@ def detect_faces(image, threshold=.6):
 def get_descriptors(image, boxes):
     return model.compute_descriptors(image, boxes)
 
-def draw_boxes(image, boxes, name):
+def draw_boxes(image, boxes, names):
     """
     It just draw boxes
     """
-    for box, name in zip(boxes, name):
-        start_x, start_y = (int(box[0])), (int(box[1]))
-        end_x, end_y = (int(box[2])), (int(box[3]))
+    print(f"Image type: {type(image)}, Image shape: {image.shape}")
+
+    for box, name in zip(boxes, names):
+        start_x, start_y = int(box[0]), int(box[1])
+        end_x, end_y = int(box[2]), int(box[3])
         color = (0, 255, 25) if name != "Unknown" else (255, 25, 0)
         image = cv2.rectangle(image, (start_x, start_y), (end_x, end_y), color, 2)
         image = cv2.putText(image, name, (start_x, start_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
@@ -216,7 +220,7 @@ def draw_boxes(image, boxes, name):
     return image
         
 
-def main(descriptors, threshold, rgb_pic):
+def main(descriptors, threshold, rgb_pic, img):
     """
     This will be the main function for the program, where it will call all the necessary functions
     and also displays interface of some sort.
@@ -231,7 +235,7 @@ def main(descriptors, threshold, rgb_pic):
     boxes = detect_faces(rgb_pic)
     names = [match(descriptor[np.newaxis, :], threshold) for descriptor in descriptors]
     
-    boxes_drawn = draw_boxes(rgb_pic, boxes, names)
+    boxes_drawn = draw_boxes(img, boxes, names)
 
     cv2.imshow('Some really cool and interesting name for this project', boxes_drawn)
     cv2.waitKey(0)
@@ -242,8 +246,8 @@ def main(descriptors, threshold, rgb_pic):
 
 if __name__ == '__main__':
     vars = initialize_database()
-    descriptors, rgb_pics = vars
+    descriptors, rgb_pics, imgs = vars
     print(f"Returns of initialize_database exist? : {descriptors and rgb_pics}")
     print(f"Length of descriptors passed to main function: {len(descriptors)} | length of images: {len(rgb_pics)}")
-    for des, pic in zip(descriptors, rgb_pics):
-        main(des, threshold, pic)
+    for des, rgbpic, img in zip(descriptors, rgb_pics, imgs):
+        main(des, threshold, rgbpic, img)

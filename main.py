@@ -12,23 +12,56 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mynn.layers.dense import dense
 from mynn.optimizers.sgd import SGD
-from database import database
-from user_profile import Profile
 import sklearn
 from camera import take_picture
-from database import initialize_data
 
-#for vscode, remove later
-'''
-from . import database
-from . import Profile
-'''
+from user_profile import *
+from pathlib import Path
+import os
+from typing import Union, List
 
 # this will download the pretrained weights for MTCNN and resnet
 # (if they haven't already been fetched)
 # which should take just a few seconds
 model = FacenetModel()
 threshold = 0.6
+
+# Initialize database
+image_path = Path("imgs/")
+database = {}
+
+def intialize_database():
+    global database
+    global image_path
+
+    for image_dir in os.listdir(image_path):
+        profile = None
+        for i, image in enumerate(os.listdir(image_dir)):
+            full_img_path = Path(image_path / image_dir / image)
+            img_rgb = image_to_rgb(full_img_path)
+            boxes = detect_faces(img_rgb)
+            descriptor_vector = get_descriptors(img_rgb, boxes)
+
+            if i == 0:
+                profile = Profile(str(image_dir), descriptors=descriptor_vector)
+            else:
+                profile.add_descriptors(descriptor_vector)
+
+        database[profile.name] = profile
+
+
+def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: List[str]):
+    """descriptors_vectors is a shape (N, 512) array and names is a length N list."""
+
+    assert len(descriptor_vectors) == len(names), f"length of descriptor_vectors and names do not match | length of vectors: {len(descriptor_vectors)}, length of names: {len(names)}"
+
+    for name, descriptor_vector in zip(names, descriptor_vectors):
+        if name in database:
+            profile = database[name]
+            profile.add_descriptors(descriptor_vector[np.newaxis, :])
+        else:
+            profile = Profile(name, descriptors=descriptor_vector[np.newaxis, :])
+            database[profile.name] = profile
 
 def image_to_rgb(image_path):
     # shape-(Height, Width, Color)
@@ -139,4 +172,5 @@ def main():
 
 
 if __name__ == '__main__':
+    intialize_database()
     main()

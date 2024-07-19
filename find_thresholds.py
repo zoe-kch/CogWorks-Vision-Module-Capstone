@@ -1,5 +1,5 @@
 from facenet_models import FacenetModel
-from database import database
+from main import database
 import numpy as np
 import matplotlib.pyplot as plt
 from camera import take_picture

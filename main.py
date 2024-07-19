@@ -61,14 +61,14 @@ def find_threshold(name: str):
     for vector in profile.descriptors: # shape (N, 512)
         dists_to_mean[cos_dist(mean_vector, vector)] = vector
 
+    # Identify the furthest distance to the mean
     furthest = max(dists_to_mean)
     furthest_vector = dists_to_mean[furthest]
 
+    # Calculate errors as distance between furthest descriptor and other profiles
     errors = []
 
     for profile in database.values():
-        if profile.name == name:
-            continue
         dist = cos_dist(furthest_vector, profile.mean_descriptor)
         errors.append(dist / 2)
 
@@ -129,15 +129,26 @@ def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: Li
             database[profile.name] = profile
 
 
-def image_to_rgb(image_to_rgb_path):
-    # shape-(Height, Width, Color)
+def image_to_rgb(image_to_rgb_path, max_width=500):
+    """# shape-(Height, Width, Color)
     print(f"{image_to_rgb_path}: image path when passed to image_to_rgb")
     image = io.imread(str(image_to_rgb_path)).astype(np.uint8) # had to change it to np.float32 bc I was getting problems without it
     if image.shape[-1] == 4:
         # Image is RGBA, where A is alpha -> transparency
         # Must make image RGB.
         image = image[..., :-1]  # png -> RGB
-    return image.astype(np.uint8)
+        
+    return image.astype(np.uint8)"""
+    from PIL import Image, ImageOps
+    image = Image.open(image_to_rgb_path)
+    image = ImageOps.exif_transpose(image)  # Correct the image orientation based on EXIF data
+    width, height = image.size
+    if width > max_width:
+        aspect_ratio = height / width
+        new_width = max_width
+        new_height = int(new_width * aspect_ratio)
+        image = image.resize((new_width, new_height))
+    return np.array(image).astype(np.uint8)
 
 def cos_dist(a,b):
     out = 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)) # changed from @ to * because a and b have different float types 
@@ -204,10 +215,12 @@ def detect_faces(image, threshold=.6):
 def get_descriptors(image, boxes):
     return model.compute_descriptors(image, boxes)
 
+
 def draw_boxes(image, boxes, names):
     """
     It just draw boxes
     """
+    
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     print(f"Image type: {type(image)}, Image shape: {image.shape}")
     for box, name in zip(boxes, names):

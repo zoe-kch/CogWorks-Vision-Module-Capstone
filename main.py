@@ -18,6 +18,7 @@ from mynn.layers.dense import dense
 from mynn.optimizers.sgd import SGD
 from database import database
 from user_profile import Profile
+import sklearn
 
 #for vscode, remove later
 '''
@@ -29,6 +30,7 @@ from . import Profile
 # (if they haven't already been fetched)
 # which should take just a few seconds
 model = FacenetModel()
+threshold = 0.6
 
 def image_to_rgb(image_path):
     # shape-(Height, Width, Color)
@@ -40,51 +42,64 @@ def image_to_rgb(image_path):
     return image.astype(np.float32)
 
 def cos_dist(a,b):
-    return 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)) # changed from @ to * because a and b have different float types 
+    out = 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)) # changed from @ to * because a and b have different float types 
+    assert out == cosine_similarity(a, b) # checking to see if these functions are equivalent
+    return out
 
 # check if cos_dist == cosine_sim
 from sklearn.metrics.pairwise import cosine_similarity
-def cosine_sim(descriptors1, descriptors2):
+def cosine_sim(descriptors1: np.ndarray, descriptors2: np.ndarray):
+    assert cos_dist(descriptors1, descriptors2) == cosine_similarity(descriptors1, descriptors2) # checking to see if these functions are equivalent
     return cosine_similarity(descriptors1, descriptors2)
 
 
-def connected_components():
-    pass
-
-
-def propogate_label():
-    pass
-
-
-def match(descriptors, threshold):
-    all_dists = {}
+def match(descriptor_vector: np.ndarray, threshold: float):
+    """all_dists = {}
     
     for name,d in database.items():
         # check is np.mean(axis=0) returns average vector im so confused :3
-        all_dists[name] = cos_dist(descriptors, np.mean(d,axis=0))
+        all_dists[name] = cos_dist(descriptor_vector, np.mean(d,axis=0))
         
     # there might be a more efficient way to do this
     min = np.min(all_dists) # min dist
     min_name = min(all_dists, key=all_dists.get) # name pertaining to min dist
     
     if min < threshold:
-        Profile.add(min_name,descriptors) # adds pic to profile
+        Profile.add(min_name,descriptor_vector) # adds pic to profile
         return str(min_name) # assuming min_name is a profile stored in database
     else:
         print('unknown')
-        Profile.add("Unknown",descriptors)
+        Profile.add("Unknown",descriptor_vector)"""
+    
+    ### descriptor_vectors.shape should be (1, 512)
 
+    global database
+
+    lowest_dist_and_profile = [3, None] # set to 3 because the bound is 2
+    for profile in database.items():
+        mean_discriptor_vector = profile.mean_discriptor_vector
+        if cosine_sim(descriptor_vector, mean_discriptor_vector) < lowest_dist_and_profile[0]:
+            lowest_dist_and_profile = [cosine_sim(descriptor_vector, mean_discriptor_vector), profile]
+
+    if lowest_dist_and_profile[0] < threshold:
+        if descriptor_vector not in profile.descriptors:
+            profile.add_descriptors(descriptor_vector)
+        return profile.name
+    else:
+        return "Unknown"
 
 def detect_faces(image, threshold=.9):
     """
     It takes in an image and return a list of
     boxes that are already filtered respect to the threshold
     """
+    global model
+
     boxes, probabilities, landmarks = model.detect(image)
     # just assuming that this is the threshold
     
     # these are a list of boxes filtered after the threshold
-    filtered = [box for box, prob in zip(boxes, probabilities) if prob > threshold]
+    filtered = [box for box, prob in zip(boxes, probabilities) if prob > threshold] #####
     
     return filtered
 
@@ -115,7 +130,7 @@ def main():
     
     boxes = detect_faces(rgb_pic)
     descriptors = get_descriptors(rgb_pic, boxes)
-    names = [match(descriptor, 0.6) for descriptor in descriptors]
+    names = [match(descriptor, threshold) for descriptor in descriptors]
     
     boxes_drawn = draw_boxes(rgb_pic, boxes, names)
     cv2.imshow('Some really cool and intersting name for this project', boxes_drawn)

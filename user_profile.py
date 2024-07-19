@@ -7,8 +7,8 @@ class Profile:
         
         self.name = name
         self.descriptors = descriptors # an array, shape (N, 512)
-        # self.mean_descriptor = get_mean_descriptor() # placeholder
-        database[name] = self # adds to database
+        self.mean_descriptor = np.mean(self.descriptors, axis=0) # might not work we'll see
+        database[name] = self # add to database, need to change this
 
     def __repr__(self):
         return self.name
@@ -17,7 +17,9 @@ class Profile:
         return self.name, self.descriptors
 
     def remove(self):
-        del database[self.name]
+        del database[self.name] # remove from database, need to change this
 
-    def add(self, name, new_descriptors: np.ndarray):
-        self.descriptors += new_descriptors
+    def add_descriptors(self, new_descriptors: np.ndarray):
+        """Adds a shape (N, 512) array of descriptors to this array (M, 512) of descriptor vectors store a (M+N, 512) array of descriptor vectors."""
+        self.descriptors = np.concatenate(self.descriptors, new_descriptors)
+

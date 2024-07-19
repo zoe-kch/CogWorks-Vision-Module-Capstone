@@ -1,6 +1,7 @@
 import numpy as np
 import networkx as nx
 import random
+from main import cos_dist, cosine_sim
 
 class Node:
     """
@@ -14,9 +15,6 @@ class Node:
         self.descriptor = descriptor
         self.truth = truth
         self.file_path = file_path
-
-def cos_dist(a,b):
-    return 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def create_adjacency_matrix(nodes, threshold):
     """

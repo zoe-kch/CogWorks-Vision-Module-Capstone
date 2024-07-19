@@ -1,11 +1,8 @@
 from facenet_models import FacenetModel
-from main import database
+from main import database, cos_dist, cosine_sim
 import numpy as np
 import matplotlib.pyplot as plt
 from camera import take_picture
-
-def cos_dist(a,b):
-    return 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
 def find_threshold(name: str):
 

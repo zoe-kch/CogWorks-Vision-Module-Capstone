@@ -70,7 +70,7 @@ def find_threshold(name: str):
 
     for profile in database.values():
         dist = cos_dist(furthest_vector, profile.mean_descriptor)
-        errors.append(dist / 2)
+        errors.append(dist)
 
     threshold = np.mean(np.array(errors))+ furthest
 
@@ -189,11 +189,12 @@ def match(descriptor_vector: np.ndarray, threshold: float):
         mean_discriptor_vector = profile.mean_descriptor # a 1-D array
         if cos_dist(descriptor_vector[0], mean_discriptor_vector) < lowest_dist_and_profile[0]:
             lowest_dist_and_profile = [cos_dist(descriptor_vector, mean_discriptor_vector), profile]
+            print(f"lowest_dist_and_profile for {profile.name}: {lowest_dist_and_profile}")
 
     if lowest_dist_and_profile[0] < threshold:
-        if descriptor_vector not in profile.descriptors:
-            profile.add_descriptors(descriptor_vector)
-        return profile.name
+        if descriptor_vector not in lowest_dist_and_profile[1].descriptors:
+            lowest_dist_and_profile[1].add_descriptors(descriptor_vector)
+        return lowest_dist_and_profile[1].name
     else:
         return "Unknown"
 

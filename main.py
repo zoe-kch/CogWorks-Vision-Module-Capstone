@@ -36,10 +36,6 @@ def intialize_database():
 
     for image_dir in os.listdir(image_path):
         profile = None
-<<<<<<< HEAD
-        print(os.listdir(image_path))
-=======
->>>>>>> 8988f3c93b6c9c647acb33a8696e60b8668b411d
         for i, image in enumerate(os.listdir(f"{image_path}//{image_dir}")):
             full_img_path = Path(image_path / image_dir / image)
             print(full_img_path)

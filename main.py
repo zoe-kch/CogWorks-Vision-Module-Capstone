@@ -59,7 +59,7 @@ def intialize_database():
                 database[profile.name] = profile
     return descriptor_vector, img_rgb
 
-
+'''
 def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: List[str]):
     """descriptors_vectors is a shape (N, 512) array and names is a length N list."""
 
@@ -72,6 +72,7 @@ def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: Li
         else:
             profile = Profile(name, descriptors=descriptor_vector[np.newaxis, :])
             database[profile.name] = profile
+'''
 
 def image_to_rgb(image_to_rgb_path):
     # shape-(Height, Width, Color)
@@ -167,17 +168,12 @@ def main(descriptors, threshold, rgb_pic):
     and also displays interface of some sort
     """
     
-
-    
     names = [match(descriptor, threshold) for descriptor in descriptors]
     
     boxes_drawn = draw_boxes(rgb_pic, boxes, names)
     cv2.imshow('Some really cool and intersting name for this project', boxes_drawn)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-    
-
 
 if __name__ == '__main__':
     vars = intialize_database()

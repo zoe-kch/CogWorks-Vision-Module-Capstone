@@ -12,7 +12,6 @@ def initialize_database():
     image_path = Path("imgs/")
 
     for image_path in os.listdir(image_path):
-        ### something something something
 
         img = cv2.imread("imgs/" + image_path)
         img = np.asarray(img)
@@ -24,5 +23,3 @@ def initialize_database():
         database[profile.__repr__()] = [descriptor_vector]
 
 print(database)
-
-#def add_to_database():

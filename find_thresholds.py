@@ -47,14 +47,10 @@ def find_threshold(name: str):
 
     threshold = np.mean(np.array(errors))+ furthest
 
-    return threshold
+    return threshold # returns a float
 
 
-
-
-
-
-model = FacenetModel()
+"""model = FacenetModel()
 
 pic1 = take_picture()
 pic2 = take_picture()
@@ -67,7 +63,7 @@ descriptor1 = model.compute_descriptors(pic1, boxes)
 descriptor2 = model.compute_descriptors(pic2, boxes2)
 
 
-find_threshold(descriptor1, descriptor2)
+find_threshold(descriptor1, descriptor2)"""
 
 
 

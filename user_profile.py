@@ -12,7 +12,7 @@ class Profile:
         return self.name
         
     def __str__(self):
-        return self.name, self.descriptors
+        return f"{self.name}, {self.descriptors}"
 
     def remove(self):
         pass
@@ -22,6 +22,6 @@ class Profile:
 
     def add_descriptors(self, new_descriptors: np.ndarray):
         """Adds a shape (N, 512) array of descriptors to this array (M, 512) of descriptor vectors store a (M+N, 512) array of descriptor vectors."""
-        self.descriptors = np.concatenate(self.descriptors, new_descriptors)
+        self.descriptors = np.concatenate((self.descriptors, new_descriptors))
         self.set_mean_descriptor_vector()
 

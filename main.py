@@ -3,6 +3,8 @@
 *Face detection model is defined here too.
 """
 from facenet_models import FacenetModel
+from user_profile import *
+
 import skimage.io as io # reading an image file in as a numpy array
 import numpy as np
 import pickle # for database
@@ -15,7 +17,6 @@ from mynn.optimizers.sgd import SGD
 import sklearn
 from camera import take_picture
 
-from user_profile import *
 from pathlib import Path
 import os
 from typing import Union, List
@@ -24,44 +25,92 @@ from typing import Union, List
 # (if they haven't already been fetched)
 # which should take just a few seconds
 model = FacenetModel()
-threshold = 0.6
+threshold = None
 
 # Initialize database
 image_path = Path("imgs")
 database = {}
 
-def intialize_database():
+def find_threshold(name: str):
+
+    # might have to modify indexing based on how db/profile are setup
+    
+    # basically threshold is that for this current label/profile we are checking
+    # it is the dist of the furthest description vector to the mean of this profile 
+    # plus the mean of half the dist of that furthest vector to any other given label's mean vector
+    # idk this might be a stupid way to do it and im happy to change it
+
+    """dists_to_mean1 = {}
+
+    dists_to_all_means = []    
+
+    for vector in database[profile1]:
+        dist = cos_dist(vector, profile1.mean_descriptor)
+        dists_to_mean1[dist] = vector
+    
+    furthest = max(dists_to_mean1)
+    furthest_vector = dists_to_mean1[furthest]
+    """
+
+    global database
+
+    dists_to_mean = {} # dis: vector
+    profile = database[name]
+    mean_vector = profile.mean_descriptor
+
+    for vector in profile.descriptors: # shape (N, 512)
+        dists_to_mean[cos_dist(mean_vector, vector)] = vector
+
+    furthest = max(dists_to_mean)
+    furthest_vector = dists_to_mean[furthest]
+
+    errors = []
+
+    for profile in database.values():
+        if profile.name == name:
+            continue
+        dist = cos_dist(furthest_vector, profile.mean_descriptor)
+        errors.append(dist / 2)
+
+    threshold = np.mean(np.array(errors))+ furthest
+
+    return threshold # returns a float
+
+
+def initialize_database():
     global database
     global image_path
+    global threshold
+    ret_descriptors, ret_rgb_img = [], []
 
     for image_dir in os.listdir(image_path):
         profile = None
-<<<<<<< HEAD
-        print(os.listdir(image_path))
-=======
->>>>>>> 8988f3c93b6c9c647acb33a8696e60b8668b411d
         for i, image in enumerate(os.listdir(f"{image_path}//{image_dir}")):
             full_img_path = Path(image_path / image_dir / image)
+
             print(full_img_path)
             img_rgb = image_to_rgb(full_img_path)
+
             boxes = detect_faces(img_rgb)
-            print(boxes)
-            if boxes: #* check if boxes are empt or not
+            print(f"The boxes of the image: {boxes}")
+
+            if boxes: #* check if boxes are empty or not
                 descriptor_vector = get_descriptors(img_rgb, boxes)
 
-                """if i == 0: # 
-                    print("Profile Initiated")
-                    profile = Profile(str(image_dir), descriptors=descriptor_vector)
-                else:
-                    profile.add_descriptors(descriptor_vector)"""
-                    
-                if profile == None: # check if profile is None, then creat profile
+                if profile == None: # check if profile is None, then create profile
                     profile = Profile(str(image_dir), descriptors=descriptor_vector)
                 else: # add profile when profile exist
                     profile.add_descriptors(descriptor_vector)
 
                 database[profile.name] = profile
-    return descriptor_vector, img_rgb
+                ret_descriptors.append(descriptor_vector)
+                ret_rgb_img.append(img_rgb)
+
+
+        if threshold is None and boxes:
+            threshold = find_threshold(str(image_dir))
+
+    return ret_descriptors, ret_rgb_img
 
 
 def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: List[str]):
@@ -89,13 +138,13 @@ def image_to_rgb(image_to_rgb_path):
 
 def cos_dist(a,b):
     out = 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b)) # changed from @ to * because a and b have different float types 
-    assert out == cosine_similarity(a, b) # checking to see if these functions are equivalent
+    # assert out == cosine_similarity(a, b) # checking to see if these functions are equivalent
     return out
 
 # check if cos_dist == cosine_sim
 from sklearn.metrics.pairwise import cosine_similarity
 def cosine_sim(descriptors1: np.ndarray, descriptors2: np.ndarray):
-    assert cos_dist(descriptors1, descriptors2) == cosine_similarity(descriptors1, descriptors2) # checking to see if these functions are equivalent
+    # assert cos_dist(descriptors1, descriptors2) == cosine_similarity(descriptors1, descriptors2) # checking to see if these functions are equivalent
     return cosine_similarity(descriptors1, descriptors2)
 
 
@@ -122,11 +171,10 @@ def match(descriptor_vector: np.ndarray, threshold: float):
     global database
 
     lowest_dist_and_profile = [3, None] # set to 3 because the bound is 2
-    for profile in database.items():
-        print(f"Type: {type(profile)}, profile: {profile}") #* temporary
-        mean_discriptor_vector = profile.mean_discriptor_vector
-        if cosine_sim(descriptor_vector, mean_discriptor_vector) < lowest_dist_and_profile[0]:
-            lowest_dist_and_profile = [cosine_sim(descriptor_vector, mean_discriptor_vector), profile]
+    for profile in database.values():
+        mean_discriptor_vector = profile.mean_descriptor # a 1-D array
+        if cos_dist(descriptor_vector[0], mean_discriptor_vector) < lowest_dist_and_profile[0]:
+            lowest_dist_and_profile = [cos_dist(descriptor_vector, mean_discriptor_vector), profile]
 
     if lowest_dist_and_profile[0] < threshold:
         if descriptor_vector not in profile.descriptors:
@@ -135,7 +183,7 @@ def match(descriptor_vector: np.ndarray, threshold: float):
     else:
         return "Unknown"
 
-def detect_faces(image, threshold=.9):
+def detect_faces(image, threshold=.6):
     """
     It takes in an image and return a list of
     boxes that are already filtered respect to the threshold
@@ -163,27 +211,38 @@ def draw_boxes(image, boxes, name):
         color = (0, 255, 25) if name != "Unknown" else (255, 25, 0)
         image = cv2.rectangle(image, (start_x, start_y), (end_x, end_y), color, 2)
         image = cv2.putText(image, name, (start_x, start_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
+
+    return image
         
 
 def main(descriptors, threshold, rgb_pic):
     """
     This will be the main function for the program, where it will call all the necessary functions
-    and also displays interface of some sort
-    """
-    
+    and also displays interface of some sort.
 
-    
-    names = [match(descriptor, threshold) for descriptor in descriptors]
+    descriptors: np.ndarray(), shape (N, 512)
+    threshold: float, global variable for matching
+    rgb_pic: np.ndarray: shape
+
+    """
+
+
+    boxes = detect_faces(rgb_pic)
+    names = [match(descriptor[np.newaxis, :], threshold) for descriptor in descriptors]
     
     boxes_drawn = draw_boxes(rgb_pic, boxes, names)
-    cv2.imshow('Some really cool and intersting name for this project', boxes_drawn)
+
+    cv2.imshow('Some really cool and interesting name for this project', boxes_drawn)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    
+
 
 
 if __name__ == '__main__':
-    vars = intialize_database()
-    descriptors, rgb_pic = vars
-    main(descriptors, threshold, rgb_pic)
+    vars = initialize_database()
+    descriptors, rgb_pics = vars
+    print(f"Returns of initialize_database exist? : {descriptors and rgb_pics}")
+    print(f"Length of descriptors passed to main function: {len(descriptors)} | length of images: {len(rgb_pics)}")
+    for des, pic in zip(descriptors, rgb_pics):
+        main(des, threshold, pic)

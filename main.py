@@ -217,12 +217,14 @@ def get_descriptors(image, boxes):
     return model.compute_descriptors(image, boxes)
 
 
-def draw_boxes(image, boxes, names):
+def draw_boxes(image, boxes, names, camera=False):
     """
     It just draw boxes
     """
-    
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    if not camera:
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    else:
+        pass
     print(f"Image type: {type(image)}, Image shape: {image.shape}")
     for box, name in zip(boxes, names):
         start_x, start_y = int(box[0]), int(box[1])
@@ -234,7 +236,7 @@ def draw_boxes(image, boxes, names):
     return image
         
 
-def main(descriptors, threshold, rgb_pic, img):
+def main(descriptors, threshold, rgb_pic, img, camera=True):
     """
     This will be the main function for the program, where it will call all the necessary functions
     and also displays interface of some sort.
@@ -244,16 +246,45 @@ def main(descriptors, threshold, rgb_pic, img):
     rgb_pic: np.ndarray: shape
 
     """
+    if camera:
+        video_capture = cv2.VideoCapture(0)
+        #raw_capture = cv2.VideoCapture(0)
+        WIDTH, HEIGHT = 640, 360
+        video_capture.set(3, WIDTH)
+        video_capture.set(4, HEIGHT)
+        
+        while True:
+            # capture the video
+            ret, frame = video_capture.read()
 
+            # mirror the frame for perfect coordination
+            if ret:
+                frame = cv2.flip(frame, 1)
+                
+                frame = np.array(frame).astype(np.uint8)
+                boxes = detect_faces(frame)
+                names = [match(descriptor[np.newaxis, :], threshold) for descriptor in descriptors]
+                
+                boxes_drawn = draw_boxes(frame, boxes, names, camera=True)
+                cv2.imshow('Some really cool and interesting name for this project', boxes_drawn)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
-    boxes = detect_faces(rgb_pic)
-    names = [match(descriptor[np.newaxis, :], threshold) for descriptor in descriptors]
+        video_capture.release()
+        cv2.destroyAllWindows()
+        
+    else:
+
+        boxes = detect_faces(rgb_pic)
+        names = [match(descriptor[np.newaxis, :], threshold) for descriptor in descriptors]
+        
+        boxes_drawn = draw_boxes(img, boxes, names)
+
+        cv2.imshow('Some really cool and interesting name for this project', boxes_drawn)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
     
-    boxes_drawn = draw_boxes(img, boxes, names)
-
-    cv2.imshow('Some really cool and interesting name for this project', boxes_drawn)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    
 
 
 

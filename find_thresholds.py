@@ -7,7 +7,7 @@ from camera import take_picture
 def cos_dist(a,b):
     return 1 - np.dot(a,b) / (np.linalg.norm(a) * np.linalg.norm(b))
 
-def find_threshold(profile1):
+def find_threshold(name: str):
 
     # might have to modify indexing based on how db/profile are setup
     
@@ -16,7 +16,7 @@ def find_threshold(profile1):
     # plus the mean of half the dist of that furthest vector to any other given label's mean vector
     # idk this might be a stupid way to do it and im happy to change it
 
-    dists_to_mean1 = {}
+    """dists_to_mean1 = {}
 
     dists_to_all_means = []    
 
@@ -26,12 +26,27 @@ def find_threshold(profile1):
     
     furthest = max(dists_to_mean1)
     furthest_vector = dists_to_mean1[furthest]
-    
+    """
+
+    global database
+
+    dists_to_mean = {} # dis: vector
+    profile = database[name]
+    mean_vector = profile.mean_descriptor_vector
+
+    for vector in profile.descriptor_vectors: # shape (N, 512)
+        dists_to_mean[cos_dist(mean_vector, vector)] = vector
+
+    furthest = max(dists_to_mean)
+    furthest_vector = dists_to_mean[furthest]
+
     errors = []
 
-    for profile in database:
+    for profile in database.items():
+        if profile.name == name:
+            continue
         dist = cos_dist(furthest_vector, profile.mean_descriptor)
-        errors += [dist / 2]
+        errors.append(dist / 2)
 
     threshold = np.mean(np.array(errors))+ furthest
 

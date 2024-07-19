@@ -1,4 +1,8 @@
 # Face Tracker
+### Brought to you by We_Love_Bytes
+![image](https://github.com/user-attachments/assets/effc65b3-6066-4bcd-8092-b9cadbfa9213)
+<br/>
+<br/>
 
 ## Table of Contents
 1. [Introduction](#introduction)

@@ -126,6 +126,7 @@ def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: Li
             profile = Profile(name, descriptors=descriptor_vector[np.newaxis, :])
             database[profile.name] = profile
 
+
 def image_to_rgb(image_to_rgb_path):
     # shape-(Height, Width, Color)
     print(f"{image_to_rgb_path}: image path when passed to image_to_rgb")

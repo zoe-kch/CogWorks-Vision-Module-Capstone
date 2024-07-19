@@ -53,3 +53,4 @@ you can still change some constant variables, such as threshold inside *main.py*
 - Edwardia Fosah
 - Bryan Wang
 - Ye Yint Hmine
+- Manya Tandon

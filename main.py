@@ -36,7 +36,7 @@ def intialize_database():
 
     for image_dir in os.listdir(image_path):
         profile = None
-        for i, image in enumerate(os.listdir(image_dir)):
+        for i, image in enumerate(os.listdir(f"{image_path}//{image_dir}")):
             full_img_path = Path(image_path / image_dir / image)
             img_rgb = image_to_rgb(full_img_path)
             boxes = detect_faces(img_rgb)

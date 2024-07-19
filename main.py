@@ -1,11 +1,7 @@
 """
-
 *Here is where all the functions will come together, with the interface
 *Face detection model is defined here too.
-
-
 """
-
 from facenet_models import FacenetModel
 import skimage.io as io # reading an image file in as a numpy array
 import numpy as np
@@ -19,6 +15,8 @@ from mynn.optimizers.sgd import SGD
 from database import database
 from user_profile import Profile
 import sklearn
+from camera import take_picture
+from database import initialize_data
 
 #for vscode, remove later
 '''
@@ -136,6 +134,7 @@ def main():
     cv2.imshow('Some really cool and intersting name for this project', boxes_drawn)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
     
 
 

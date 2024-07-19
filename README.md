@@ -49,7 +49,7 @@ you can still change some constant variables, such as threshold inside *main.py*
 
 
 ## Contributors
-> Zoe Granadoz
-> Edwardia Fosah
-> Bryan Wang
-> Ye Yint Hmine
+- Zoe Granadoz
+- Edwardia Fosah
+- Bryan Wang
+- Ye Yint Hmine

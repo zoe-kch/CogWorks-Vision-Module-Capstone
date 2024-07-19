@@ -87,7 +87,7 @@ def initialize_database():
         profile = None
         for i, image in enumerate(os.listdir(f"{image_path}//{image_dir}")):
             full_img_path = Path(image_path / image_dir / image)
-
+            
             print(full_img_path)
             img = image_to_rgb(full_img_path)
             img_rgb = image_to_rgb(full_img_path)
@@ -132,7 +132,7 @@ def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: Li
 def image_to_rgb(image_to_rgb_path):
     # shape-(Height, Width, Color)
     print(f"{image_to_rgb_path}: image path when passed to image_to_rgb")
-    image = io.imread(str(image_to_rgb_path)).astype(np.float32) # had to change it to np.float32 bc I was getting problems without it
+    image = io.imread(str(image_to_rgb_path)).astype(np.uint8) # had to change it to np.float32 bc I was getting problems without it
     if image.shape[-1] == 4:
         # Image is RGBA, where A is alpha -> transparency
         # Must make image RGB.
@@ -208,8 +208,8 @@ def draw_boxes(image, boxes, names):
     """
     It just draw boxes
     """
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     print(f"Image type: {type(image)}, Image shape: {image.shape}")
-
     for box, name in zip(boxes, names):
         start_x, start_y = int(box[0]), int(box[1])
         end_x, end_y = int(box[2]), int(box[3])

@@ -27,7 +27,7 @@ model = FacenetModel()
 threshold = 0.6
 
 # Initialize database
-image_path = Path("imgs/")
+image_path = Path("imgs")
 database = {}
 
 def intialize_database():
@@ -36,18 +36,29 @@ def intialize_database():
 
     for image_dir in os.listdir(image_path):
         profile = None
-        for i, image in enumerate(os.listdir(image_dir)):
+        print(os.listdir(image_path))
+        for i, image in enumerate(os.listdir(f"{image_path}//{image_dir}")):
             full_img_path = Path(image_path / image_dir / image)
+            print(full_img_path)
             img_rgb = image_to_rgb(full_img_path)
             boxes = detect_faces(img_rgb)
-            descriptor_vector = get_descriptors(img_rgb, boxes)
+            print(boxes)
+            if boxes: #* check if boxes are empt or not
+                descriptor_vector = get_descriptors(img_rgb, boxes)
 
-            if i == 0:
-                profile = Profile(str(image_dir), descriptors=descriptor_vector)
-            else:
-                profile.add_descriptors(descriptor_vector)
+                """if i == 0: # 
+                    print("Profile Initiated")
+                    profile = Profile(str(image_dir), descriptors=descriptor_vector)
+                else:
+                    profile.add_descriptors(descriptor_vector)"""
+                    
+                if profile == None: # check if profile is None, then creat profile
+                    profile = Profile(str(image_dir), descriptors=descriptor_vector)
+                else: # add profile when profile exist
+                    profile.add_descriptors(descriptor_vector)
 
-        database[profile.name] = profile
+                database[profile.name] = profile
+    return descriptor_vector, img_rgb
 
 
 def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: List[str]):
@@ -63,9 +74,10 @@ def add_descriptor_vectors_to_database(descriptor_vectors: np.ndarray, names: Li
             profile = Profile(name, descriptors=descriptor_vector[np.newaxis, :])
             database[profile.name] = profile
 
-def image_to_rgb(image_path):
+def image_to_rgb(image_to_rgb_path):
     # shape-(Height, Width, Color)
-    image = io.imread(str(image_path)).astype(np.float32) # had to change it to np.float32 bc I was getting problems without it
+    print(f"{image_to_rgb_path}: image path when passed to image_to_rgb")
+    image = io.imread(str(image_to_rgb_path)).astype(np.float32) # had to change it to np.float32 bc I was getting problems without it
     if image.shape[-1] == 4:
         # Image is RGBA, where A is alpha -> transparency
         # Must make image RGB.
@@ -108,6 +120,7 @@ def match(descriptor_vector: np.ndarray, threshold: float):
 
     lowest_dist_and_profile = [3, None] # set to 3 because the bound is 2
     for profile in database.items():
+        print(f"Type: {type(profile)}, profile: {profile}") #* temporary
         mean_discriptor_vector = profile.mean_discriptor_vector
         if cosine_sim(descriptor_vector, mean_discriptor_vector) < lowest_dist_and_profile[0]:
             lowest_dist_and_profile = [cosine_sim(descriptor_vector, mean_discriptor_vector), profile]
@@ -149,18 +162,14 @@ def draw_boxes(image, boxes, name):
         image = cv2.putText(image, name, (start_x, start_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
         
 
-def main():
+def main(descriptors, threshold, rgb_pic):
     """
     This will be the main function for the program, where it will call all the necessary functions
     and also displays interface of some sort
     """
     
 
-    pic = "imgs/newton.png"
-    rgb_pic = image_to_rgb(pic)
     
-    boxes = detect_faces(rgb_pic)
-    descriptors = get_descriptors(rgb_pic, boxes)
     names = [match(descriptor, threshold) for descriptor in descriptors]
     
     boxes_drawn = draw_boxes(rgb_pic, boxes, names)
@@ -172,5 +181,6 @@ def main():
 
 
 if __name__ == '__main__':
-    intialize_database()
-    main()
+    vars = intialize_database()
+    descriptors, rgb_pic = vars
+    main(descriptors, threshold, rgb_pic)

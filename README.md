@@ -16,8 +16,8 @@
 > This project aims to perform facial recognition from a database of faces. It can be used in various implementations
 > such as cameras for security and healthcare monitoring and hotel check ins/school attendance.
 
-*Note: This project was created as part of BWSI CogWorks Week2 Vision Capstone project*
-*Presented by Team We Love Bytes 2024*
+*Note: This project was created as part of BWSI CogWorks Week2 Vision Capstone project.*
+*Presented by Team We Love Bytes 2024.*
 
 ## Features
 These are some important features that our program can accomplish:
@@ -30,8 +30,8 @@ These are some important features that our program can accomplish:
 
 ## Installation
 
-For installation of this program, we recommend you use conda
-More information about conda installation is in conda website
+Before the installation of this program, we recommend you utilize a conda environment.
+For more information about conda installation, visit [https://conda.io/projects/conda/en/latest/user-guide/install/index.html].
 
 ```bash
 # Clone the repository

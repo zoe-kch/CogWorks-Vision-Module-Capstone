@@ -141,7 +141,7 @@ def draw_boxes(image, boxes, names, camera: bool):
     if not camera: # if not or if, we'll never know
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-    print(f"Image type: {type(image)}, Image shape: {image.shape}")
+    # print(f"Image type: {type(image)}, Image shape: {image.shape}")
     for box, name in zip(boxes, names):
         start_x, start_y = int(box[0]), int(box[1])
         end_x, end_y = int(box[2]), int(box[3])

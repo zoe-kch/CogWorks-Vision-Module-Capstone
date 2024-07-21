@@ -1,5 +1,6 @@
 # run pip install -r requirements
 
+tkinter
 matplotlib
 pytorch
 torchvision

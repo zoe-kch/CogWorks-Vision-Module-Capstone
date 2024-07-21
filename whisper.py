@@ -1,7 +1,7 @@
 import numpy as np
 import networkx as nx
 import random
-from main import cos_dist, cosine_sim
+from main import cos_dist
 import matplotlib.pyplot as plt
 
 class Node:

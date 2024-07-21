@@ -55,7 +55,7 @@ Once the environment is activate, run:
 pip install mygrad mynn noggin facenet-pytorch cog-datasets
 ```
 
-Next, install the [Camera](https://github.com/CogWorksBWSI/Camera/tree/master) and [facenet_models](https://github.com/CogWorksBWSI/facenet_models?tab=readme-ov-file) packages by following the instructions on the respective GitHubs. Note to make sure your Camera settings is properly configured and initialized prior to running main.py.
+Next, install the [Camera](https://github.com/CogWorksBWSI/Camera/tree/master) and [facenet_models](https://github.com/CogWorksBWSI/facenet_models?tab=readme-ov-file) packages by following the instructions on the respective GitHubs. Note to make sure your Camera settings are properly configured and initialized prior to running main.py.
 
 Navigate back to your original parent folder and clone this repository.
 ```bash
@@ -65,10 +65,15 @@ Navigate to our folder.
 ```bash
 cd CogWorks-Vision-Module-Capstone
 ```
-And install all dependencies.
+Install all dependencies.
 ```bash
 pip install -r requirements.txt
 ```
+And run main.py to start the program.
+```bash
+python main.py
+```
+
 ## Usage
 > It is important to use this technology with ethnics and consideration in mind. Privacy is a right.
 

@@ -31,25 +31,51 @@ These are some important features that our program can accomplish:
 ## Installation
 
 Before the installation of this program, we recommend you utilize a conda environment.
-For more information about conda installation, visit [https://conda.io/projects/conda/en/latest/user-guide/install/index.html].
+For more information about conda installation, visit https://conda.io/projects/conda/en/latest/user-guide/install/index.html.
 
+To set up the optimal conda environment, run the appropriate command and replace `env_name` with whatever you like.
+
+For Windows/Linux, run:
 ```bash
-# Clone the repository
+conda create -n env_name python=3.8 jupyter notebook numpy matplotlib xarray numba bottleneck scipy opencv scikit-learn scikit-image pytorch torchvision cpuonly -c pytorch -c conda-forge
+```
+
+For Mac OS, run:
+```bash
+conda create -n env_name python=3.8 jupyter notebook numpy matplotlib xarray numba bottleneck scipy opencv scikit-learn scikit-image pytorch torchvision -c pytorch -c conda-forge
+```
+
+Activate the environment by running:
+```bash
+conda activate env_name
+```
+
+Once the environment is activate, run:
+```bash
+pip install mygrad mynn noggin facenet-pytorch cog-datasets
+```
+
+Next, install the [Camera](https://github.com/CogWorksBWSI/Camera/tree/master) and [facenet_models](https://github.com/CogWorksBWSI/facenet_models?tab=readme-ov-file) packages by following the instructions on the respective GitHubs. Note to make sure your Camera settings is properly configured and initialized prior to running main.py.
+
+Navigate back to your original parent folder and clone this repository.
+```bash
 git clone https://github.com/zoe-kch/CogWorks-Vision-Module-Capstone.git
+```
+Navigate to our folder.
+```bash
 cd CogWorks-Vision-Module-Capstone
-# Install all dependencies
+```
+And install all dependencies.
+```bash
 pip install -r requirements.txt
 ```
 ## Usage
-> We do not hold liability for this program
-> It can be implemented in many ways,
-> by getting data from the return statement of the *main.py*
+> It is important to use this technology with ethnics and consideration in mind. Privacy is a right.
 
 
 ## Configuration
-
 We already optimized the configuration of this program. However,
-you can still change some constant variables, such as threshold inside *main.py*
+you can still change some constant variables, such as threshold inside *find_thresholds.py*
 
 
 ## Contributors

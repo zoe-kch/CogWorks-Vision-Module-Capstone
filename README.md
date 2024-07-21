@@ -13,20 +13,20 @@
 6. [Contributing](#contributors)
 
 ## Introduction
-> This project aim to detect faces from a database of faces. It can be used in various implementation
-> Such as Cameras for security, healthcare monitoring per person, Hotel/School Attendance check ins.
+> This project aims to perform facial recognition from a database of faces. It can be used in various implementations
+> such as cameras for security and healthcare monitoring and hotel check ins/school attendance.
 
 *Note: This project was created as part of BWSI CogWorks Week2 Vision Capstone project*
 *Presented by Team We Love Bytes 2024*
 
 ## Features
 These are some important features that our program can accomplish:
-- [x] A fully trained model
+- [x] A fully trained Facenet model
 - [x] Face-detection system
-- [x] A database of recognized faces
-- [x] Loading new faces to the database
+- [x] A database of recognized faces (includes Edwardia Fosah (one of this project's contributors), Davido, Lana Del Rey, Malcolm X, Issac Newton, Rema, Steve Lacy, and Taika Waititi initially)
+- [x] Loading new faces to the database via dialog prompt
 - [x] Recognizing known and unknown faces
-- [x] Whisper algorithm
+- [x] Prototype** Whisper algorithm
 
 ## Installation
 

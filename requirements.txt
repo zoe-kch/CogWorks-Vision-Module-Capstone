@@ -1,15 +1,14 @@
 # run pip install -r requirements
 
-tkinter
+# tkinter
 matplotlib
-pytorch
+torch
 torchvision
 facenet-pytorch
 numpy
-pickle
+# pickle
 networkx
-skimage
 mygrad
-noggins
+# noggins
 mynn
 scikit-image

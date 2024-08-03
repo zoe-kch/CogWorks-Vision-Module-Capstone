@@ -104,7 +104,7 @@ def match(descriptor_vector: np.ndarray, threshold: float=threshold):
         mean_discriptor_vector = profile.mean_descriptor # a 1-D array
         if cos_dist(descriptor_vector[0], mean_discriptor_vector) < lowest_dist_and_profile[0]:
             lowest_dist_and_profile = [cos_dist(descriptor_vector, mean_discriptor_vector), profile]
-            print(f"lowest_dist_and_profile for {profile.name}: {lowest_dist_and_profile}")
+            # print(f"lowest_dist_and_profile for {profile.name}: {lowest_dist_and_profile}")
 
     if lowest_dist_and_profile[0] < threshold:
         if descriptor_vector not in lowest_dist_and_profile[1].descriptors:
@@ -141,7 +141,7 @@ def draw_boxes(image, boxes, names, camera: bool):
     if not camera: # if not or if, we'll never know
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-    print(f"Image type: {type(image)}, Image shape: {image.shape}")
+    # print(f"Image type: {type(image)}, Image shape: {image.shape}")
     for box, name in zip(boxes, names):
         start_x, start_y = int(box[0]), int(box[1])
         end_x, end_y = int(box[2]), int(box[3])

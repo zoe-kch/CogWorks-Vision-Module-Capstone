@@ -36,9 +36,9 @@ database = {}
 with open('database.pkl', 'rb') as f:
     database = pickle.load(f)
 
-threshold = None
-with open('threshold.txt', 'r') as f:
-    threshold = float(f.readline().strip())
+threshold = 0.36 # hard code
+# with open('threshold.txt', 'r') as f:
+#    threshold = float(f.readline().strip())
 
 
 
@@ -190,13 +190,15 @@ def main():
             frame = cv2.flip(frame, 1)
                 
             frame = np.array(frame).astype(np.uint8) # shape (640, 360, 3)
+            feed = frame
+
             boxes = detect_faces(frame)
             if boxes:
                 descriptors = get_descriptors(frame, boxes) # shape (N, 512) array
                 names = [match(descriptor[np.newaxis, :], threshold) for descriptor in descriptors]
                 
-                boxes_drawn = draw_boxes(frame, boxes, names, camera=True)
-                cv2.imshow('This You?', boxes_drawn)
+                feed = draw_boxes(frame, boxes, names, camera=True)
+            cv2.imshow('This You?', feed)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

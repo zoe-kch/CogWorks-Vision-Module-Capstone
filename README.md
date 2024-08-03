@@ -75,7 +75,9 @@ python main.py
 ```
 
 ## Usage
-> It is important to use this technology with ethnics and consideration in mind. Privacy is a right.
+![vision_capstone_example](https://github.com/user-attachments/assets/8904f2b8-99fd-45fc-98ed-b095c899397b)
+
+> Note: It is important to use this technology with ethics and consideration in mind. Privacy is a right.
 
 
 ## Configuration

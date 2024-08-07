@@ -75,7 +75,8 @@ python main.py
 ```
 
 ## Usage
-![vision_capstone_example](https://github.com/user-attachments/assets/8904f2b8-99fd-45fc-98ed-b095c899397b)
+![image](https://github.com/user-attachments/assets/8acf50c0-0406-465c-ac19-f07dc9c92824)
+
 
 > Note: It is important to use this technology with ethics and consideration in mind. Privacy is a right.
 

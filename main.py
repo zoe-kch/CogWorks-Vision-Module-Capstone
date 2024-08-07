@@ -36,9 +36,9 @@ database = {}
 with open('database.pkl', 'rb') as f:
     database = pickle.load(f)
 
-threshold = 0.36 # hard code
-# with open('threshold.txt', 'r') as f:
-#    threshold = float(f.readline().strip())
+threshold = None
+with open('threshold.txt', 'r') as f:
+    threshold = float(f.readline().strip())
 
 
 
